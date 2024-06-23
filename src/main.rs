@@ -1,7 +1,7 @@
-use cpu::Cpu;
+use chip8::Chip8;
 
 mod ram;
-mod cpu;
+mod chip8;
 
 use std::{fs::File, io::Read};
 
@@ -11,8 +11,8 @@ fn main() {
     file.read_to_end(&mut content).expect("Couldn't read the file");
 
     //Loading the data in CPU RAM
-    let mut cpu = Cpu::new();
-    cpu.load_rom(&content);
+    let mut chip8 = Chip8::new();
+    chip8.load_rom(&content);
 
 
 

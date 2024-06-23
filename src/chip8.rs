@@ -1,13 +1,13 @@
 use crate::ram::Ram;
 
-pub struct Cpu {
+pub struct Chip8 {
     ram : Ram,
 }
 
-impl Cpu{
-    pub fn new() -> Cpu
+impl Chip8{
+    pub fn new() -> Chip8
     {
-        Cpu{
+        Chip8{
             ram : Ram::new()
         }
     }
