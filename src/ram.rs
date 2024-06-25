@@ -34,7 +34,7 @@ impl Ram {
             }
         }
         for i in 0..0x1ff{
-            print!("{:#x} ",ram.read_byte(i));
+            // print!("{:#x} ",ram.read_byte(i));
         }
         ram
     }

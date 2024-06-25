@@ -39,7 +39,7 @@ impl Display{
     pub fn draw(&self, chip8_display: &[[u8;64];32]) {
         for y in 0..32 {
             for x in 0..64 {
-                println!("Checking pixel at x : {} y : {} , value : {}",x,y,chip8_display[y][x]);
+                // println!("Checking pixel at x : {} y : {} , value : {}",x,y,chip8_display[y][x]);
                 if chip8_display[y][x] > 0{
                     // println!("Drawing pixel at x : {} y : {}",x,y);
                     draw_rectangle(
