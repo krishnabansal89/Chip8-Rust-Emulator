@@ -1,3 +1,4 @@
+
 use std::u16;
 
 use crate::display::Display;
@@ -56,6 +57,14 @@ impl Cpu {
         opcode
     }
 
+    pub fn update_timers(&mut self) {
+        if self.dt > 0 {
+            self.dt -= 1;
+        }
+        // Do the same for sound timer if you have one
+    }
+    
+
     fn execute_opcode(&mut self, opcode: u16, ram: &mut Ram) {
         let x = ((opcode & 0x0F00) >> 8) as usize;
         let y = ((opcode & 0x00F0) >> 4) as usize;
@@ -64,7 +73,8 @@ impl Cpu {
         let n = (opcode & 0x000F) as u8;
         let _x = self.vx[x];
         let _y = self.vx[y];
-        // println!("Executing opcode {:#x}",opcode);
+        println!("Executing opcode {:#x}",opcode);
+
         match opcode & 0xF000 {
             0x0000 => {
                 match opcode & 0x00FF {
@@ -117,13 +127,15 @@ impl Cpu {
                     self.vx[x] = self.vx[x] ^ self.vx[y];
                 }
                 0x0004 => {
-                    self.vx[x] = self.vx[x] + self.vx[y] as u8;
-                    if (self.vx[x] as u16 + self.vx[y] as u16) > 0xFF {
+                    let _ = self.vx[x].wrapping_add(self.vx[y]);
+                    if self.vx[x] as u16 + self.vx[y] as u16 > 0xFF {
                         self.vx[0xF] = 1;
+                    } else {
+                        self.vx[0xF] = 0;
                     }
                 }
                 0x0005 => {
-                    self.vx[x] = self.vx[x] - self.vx[y];
+                    let _ = self.vx[x].wrapping_sub(self.vx[y]);
                     if self.vx[x] > self.vx[y] {
                         self.vx[0xF] = 1;
                     } else {
@@ -164,13 +176,17 @@ impl Cpu {
                 self.vx[x] = random_number & nn;
             }
             0xD000 => {
-                self.display.draw_sprite(
+                self.vx[0xF] = 0; 
+                let collison = self.display.draw_sprite(
                     self.vx[x],
                     self.vx[y],
                     &ram.mem[self.i as usize..self.i as usize + n as usize],
                 );
+                self.vx[0xF] = collison as u8;
             }
-            0xE000 => match opcode & 0x00FF {
+            0xE000 => {
+                println!("Opcode {:#x}", opcode);
+                match opcode & 0x00FF {
                 0x009E => {
                     println!("Opcode Ex9E: Checking if key {} is pressed", self.vx[x]);
                     if self.key_state[self.vx[x] as usize] {
@@ -179,7 +195,6 @@ impl Cpu {
                     }
                 }
             
-
                 0x00A1 => {
                     println!("Opcode ExA1: Checking if key {} is not pressed", self.vx[x]);
                     if !self.key_state[self.vx[x] as usize] {
@@ -190,7 +205,7 @@ impl Cpu {
             
                             
                 _ => panic!("Unknown opcode {:#x}", opcode),
-            },
+            }},
 
             0xF000 => match opcode & 0x00FF {
                 0x0007 => {

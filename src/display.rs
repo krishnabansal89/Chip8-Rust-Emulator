@@ -28,6 +28,7 @@ impl Display{
                         collision = true;
                     }
                     self.screen[y][x] ^= 1;
+                    
                 }
             }
         }
